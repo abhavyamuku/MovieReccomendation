@@ -1,0 +1,45 @@
+import pandas as pd
+import numpy as np
+import ast
+from sklearn.feature_extraction.text import CountVectorizer
+from sklearn.metrics.pairwise import cosine_similarity
+import pickle
+movies = pd.read_csv('C:/Users/mukua/OneDrive/Desktop/Movie recco/tmdb_5000_movies.csv')
+credits = pd.read_csv('C:/Users/mukua/OneDrive/Desktop/Movie recco/tmdb_5000_credits.csv')
+# Merge on 'title'
+movies = movies.merge(credits, on='title')
+
+# Keep only useful columns
+movies = movies[['movie_id', 'title', 'overview', 'genres', 'keywords', 'cast', 'crew']]
+def convert(obj):
+    L = []
+    for i in ast.literal_eval(obj):
+        L.append(i['name'])
+    return L
+
+def get_director(obj):
+    for i in ast.literal_eval(obj):
+        if i['job'] == 'Director':
+            return i['name']
+    return ''
+
+movies.dropna(inplace=True)
+
+movies['genres'] = movies['genres'].apply(convert)
+movies['keywords'] = movies['keywords'].apply(convert)
+movies['cast'] = movies['cast'].apply(lambda x: convert(x)[:3])
+movies['crew'] = movies['crew'].apply(get_director)
+
+movies['overview'] = movies['overview'].apply(lambda x: x.split())
+
+# Rename for simplicity
+movies.rename(columns={'crew': 'director'}, inplace=True)
+
+# Join everything
+movies['tags'] = movies['overview'] + movies['genres'] + movies['keywords'] + movies['cast']
+movies['tags'] = movies['tags'].apply(lambda x: " ".join(x))
+cv = CountVectorizer(max_features=5000, stop_words='english')
+vectors = cv.fit_transform(movies['tags']).toarray()
+similarity = cosine_similarity(vectors)
+pickle.dump(movies[['movie_id', 'title']], open('movies.pkl', 'wb'))
+pickle.dump(similarity, open('model.pkl', 'wb'))

@@ -1,0 +1,45 @@
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Movie Recommendation System</title>
+</head>
+<body>
+    <h1>Welcome to the Movie Recommendation System</h1>
+
+    <form action="/recommend" method="POST">
+        <label for="movie_title">Enter Movie Title:</label>
+        <input type="text" id="movie_title" name="movie_title" required><br><br>
+
+        <label for="genre">Choose Genre:</label>
+        <select name="genre" id="genre">
+            <option value="All">All</option>
+            <option value="Action">Action</option>
+            <option value="Comedy">Comedy</option>
+            <option value="Drama">Drama</option>
+            <option value="Horror">Horror</option>
+            <option value="Romance">Romance</option>
+            <!-- Add more as per your dataset -->
+        </select><br><br>
+
+        <label for="min_year">From Year:</label>
+        <input type="number" id="min_year" name="min_year" placeholder="e.g. 2010"><br><br>
+
+        <label for="min_rating">Minimum Rating:</label>
+        <input type="number" step="0.1" id="min_rating" name="min_rating" placeholder="e.g. 7.5"><br><br>
+
+        <button type="submit">Recommend</button>
+    </form>
+
+    {% if movie_title %}
+        <h2>Recommended Movies for "{{ movie_title }}"</h2>
+        <ul>
+            {% for movie in recommended_movies %}
+                <li>{{ movie }}</li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+</body>
+</html>

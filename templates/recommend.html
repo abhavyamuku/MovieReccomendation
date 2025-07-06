@@ -1,0 +1,29 @@
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+
+def recommend_movie(movie_title):
+    try:
+        # Check if the movie exists in the DataFrame
+        idx_list = movies.index[movies['title'] == movie_title].tolist()
+        
+        # If movie is not found, idx_list will be empty
+        if not idx_list:
+            return []  # No recommendations if movie is not found
+        
+        # If movie is found, get its index
+        idx = idx_list[0]
+        
+        # Get recommendations based on the found index (you can add logic here)
+        recommended_movies = movies.iloc[idx].get('recommendations', [])
+        
+        return recommended_movies
+    
+    except Exception as e:
+        print(f"Error in recommend_movie: {e}")
+        return []
+        <h2>Recommended Movies:</h2>
+        <ul>
+          {% for movie in movies %}
+            <li>{{ movie }}</li>
+          {% endfor %}
+        </ul>
+        
